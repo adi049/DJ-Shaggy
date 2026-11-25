@@ -50,7 +50,7 @@ export default function AdminLogin() {
             <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
             <input
               type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@djshaggy.com"
+              placeholder="djshaggy2025@gmail.com"
               className="w-full rounded-xl border border-line bg-ink py-3 pl-10 pr-4 text-sm text-silver placeholder:text-muted/50 focus:border-gold/60 focus:outline-none"
             />
           </div>
