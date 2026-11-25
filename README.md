@@ -19,7 +19,7 @@ The database schema is managed in the connected Supabase project; see tables: `p
 ## Admin access
 
 - Admin login lives behind the discreet three-dot menu in the footer (`/admin/login`).
-- Seeded demo admin: **admin@djshaggy.com** (password set during provisioning — change it in Supabase Auth immediately).
+- The currently configured admin allowlist contains **djshaggy2025@gmail.com**. Sign in with that confirmed Supabase Auth account. The `admin@djshaggy.com` address previously shown in this README is not present in the connected project's Auth users or admin allowlist.
 - Admin authorization is enforced **server-side**: API routes verify the Supabase session and check the email against `settings → admin.emails` (editable in Admin → Settings → General).
 
 ## Payments (manual UPI — active system)
@@ -105,7 +105,7 @@ This repository includes a built-in Node HTTP runtime in `server.js`. It runs th
 
 ### Hostinger
 
-1. Use a Hostinger plan that explicitly supports a persistent Node.js application for your account and region. A static-only shared hosting plan cannot run this API server.
+1. Use a Hostinger **Business/Unlimited** web hosting plan or a Cloud plan that supports Node.js Web Apps. Hostinger's current documentation does not list Premium web hosting for managed Node.js apps; a static-only plan cannot run this API server.
 2. Upload/pull the repository into the Node.js app root and set the app startup file to `server.js` (or startup command `npm start`).
 3. Set the environment variables in Hostinger's Node.js app panel. Keep `SUPABASE_SERVICE_ROLE_KEY` server-side only; never prefix it with `VITE_` and never put it in client code.
 4. Build before starting: `npm ci && npm run build`. The Node app serves `dist/` and handles `/api/*` on the same origin.
