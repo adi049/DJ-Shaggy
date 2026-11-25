@@ -26,20 +26,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await fetch('/api/settings?all=1', {
         headers: { Authorization: `Bearer ${s.access_token}` },
       });
+      if (res.status >= 500) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || `Admin API failed (${res.status}). Check server environment and logs.`);
+      }
       return res.ok;
-    } catch { return false; }
+    } catch (error) {
+      if (error instanceof Error && error.message !== 'Failed to fetch') throw error;
+      throw new Error('Cannot reach the admin API. Start the Node API server and check its environment variables.');
+    }
   };
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
-      const admin = await checkAdmin(data.session);
+      let admin = false;
+      try { admin = await checkAdmin(data.session); } catch (error) { console.error('Admin verification failed:', error); }
       setIsAdmin(admin);
       setLoading(false);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_e, s) => {
       setSession(s);
-      setIsAdmin(await checkAdmin(s));
+      try { setIsAdmin(await checkAdmin(s)); } catch (error) { console.error('Admin verification failed:', error); setIsAdmin(false); }
       setLoading(false);
     });
     return () => subscription.unsubscribe();
