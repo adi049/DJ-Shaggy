@@ -2,7 +2,7 @@
 
 A complete, full-stack marketplace for selling DJ playlists & remix packs: storefront, catalogue, cart, manual UPI checkout, admin panel, Google Drive import, digital delivery and branded transactional emails.
 
-**Stack:** Vite + React + TypeScript + Tailwind CSS v4 (SPA) · Vercel Serverless API routes (`/api`) · Supabase (PostgreSQL + Auth + Storage) · Google Drive API · Resend (email) · optional OpenAI-compatible AI chat.
+**Stack:** Vite + React + TypeScript + Tailwind CSS v4 (SPA) · Node.js API runtime (`server.js`, `/api`) · Supabase (PostgreSQL + Auth + Storage) · Google Drive API · Resend (email) · optional OpenAI-compatible AI chat.
 
 ---
 
