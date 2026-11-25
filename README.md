@@ -2,7 +2,7 @@
 
 A complete, full-stack marketplace for selling DJ playlists & remix packs: storefront, catalogue, cart, manual UPI checkout, admin panel, Google Drive import, digital delivery and branded transactional emails.
 
-**Stack:** Vite + React + TypeScript + Tailwind CSS v4 (SPA) · Vercel Serverless API routes (`/api`) · Supabase (PostgreSQL + Auth + Storage) · Google Drive API · Resend (email) · optional OpenAI-compatible AI chat.
+**Stack:** Vite + React + TypeScript + Tailwind CSS v4 (SPA) · Node.js API runtime (`server.js`, `/api`) · Supabase (PostgreSQL + Auth + Storage) · Google Drive API · Resend (email) · optional OpenAI-compatible AI chat.
 
 ---
 
@@ -14,12 +14,12 @@ npm run build       # type-check + production build
 npm run dev         # local dev
 ```
 
-Deploy to Vercel (the repo is pre-wired: SPA rewrites + env vars). The database schema is created with the platform's Supabase tools; see `supabase` tables: `products`, `genres`, `collections`, `bundles`, `orders`, `faqs`, `discounts`, `messages`, `settings`, `drive_import_log`.
+The database schema is managed in the connected Supabase project; see tables: `products`, `genres`, `collections`, `bundles`, `orders`, `faqs`, `discounts`, `messages`, `settings`, `drive_import_log`.
 
 ## Admin access
 
 - Admin login lives behind the discreet three-dot menu in the footer (`/admin/login`).
-- Seeded demo admin: **admin@djshaggy.com** (password set during provisioning — change it in Supabase Auth immediately).
+- The currently configured admin allowlist contains **djshaggy2025@gmail.com**. Sign in with that confirmed Supabase Auth account. The `admin@djshaggy.com` address previously shown in this README is not present in the connected project's Auth users or admin allowlist.
 - Admin authorization is enforced **server-side**: API routes verify the Supabase session and check the email against `settings → admin.emails` (editable in Admin → Settings → General).
 
 ## Payments (manual UPI — active system)
@@ -91,3 +91,32 @@ The app keeps working unchanged (all data flows through `/api/*` with the servic
 4. Footer → ⋯ → Admin login → Orders → Review → Approve & Deliver (verify email, or the "not sent" notice if Resend isn't configured).
 5. Track the order on `/track` with ID + email.
 6. Drive Import → scan/import (needs Drive env vars).
+
+## Hostinger Node.js deployment (no Vercel)
+
+This repository includes a built-in Node HTTP runtime in `server.js`. It runs the existing `api/*.js` handlers and serves the Vite production build from `dist/`; no Express dependency or Vercel runtime is required.
+
+### Local development
+
+1. Copy `.env.example` to `.env` and fill the Supabase values (see Environment variables below).
+2. Terminal 1: `npm run api` (starts the API on port 8787).
+3. Terminal 2: `npm run dev` (Vite proxies `/api/*` to port 8787).
+4. Open the local Vite URL. Check `/healthz` on port 8787 for the backend health response.
+
+### Hostinger
+
+1. Use a Hostinger **Business/Unlimited** web hosting plan or a Cloud plan that supports Node.js Web Apps. Hostinger's current documentation does not list Premium web hosting for managed Node.js apps; a static-only plan cannot run this API server.
+2. Upload/pull the repository into the Node.js app root and set the app startup file to `server.js` (or startup command `npm start`).
+3. Set the environment variables in Hostinger's Node.js app panel. Keep `SUPABASE_SERVICE_ROLE_KEY` server-side only; never prefix it with `VITE_` and never put it in client code.
+4. Build before starting: `npm ci && npm run build`. The Node app serves `dist/` and handles `/api/*` on the same origin.
+5. Set the Node app's document/root path to the repository root and let Hostinger provide `PORT`. The server binds to `0.0.0.0`.
+6. Point `djshaggymusic.com` to the Node app using Hostinger's domain/Node.js app controls, then verify `https://djshaggymusic.com/healthz` returns JSON with `ok: true`.
+
+### Required environment variables
+
+- `NEXT_PUBLIC_SUPABASE_URL` (or `VITE_SUPABASE_URL`)
+- `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` for browser Supabase Auth
+- `SUPABASE_SERVICE_ROLE_KEY` for server API handlers; server-only secret
+- Optional: `RESEND_API_KEY`, `GOOGLE_DRIVE_API_KEY` or `GOOGLE_SERVICE_ACCOUNT_JSON`, `AI_API_KEY`
+
+Do not commit `.env`. Use `.env.example` as the blank template. A successful build does not prove third-party credentials or Drive permissions are configured; test those separately after deployment.

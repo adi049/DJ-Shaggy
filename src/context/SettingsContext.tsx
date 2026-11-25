@@ -57,7 +57,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const load = async () => {
     try {
       const res = await fetch('/api/settings');
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `Settings API failed (${res.status})`);
       setSettings({
         payment: { ...DEFAULT_SETTINGS.payment, ...(data.payment || {}) },
         whatsapp: { ...DEFAULT_SETTINGS.whatsapp, ...(data.whatsapp || {}) },
